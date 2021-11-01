@@ -1,0 +1,8 @@
+.DS_Store
+.idea/
+__pycache__/
+auto/
+checkpoints/
+28.png
+saved.png
+assets/logo.xcf
