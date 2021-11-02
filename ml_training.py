@@ -55,7 +55,7 @@ class MNIST_lzma(MNIST):
 
 
 @timeit
-def load_train():
+def load_train(**kwargs):
     print("Loading train data")
     mndata = MNIST_lzma('./MNIST/', return_type='numpy', lzma=True)
 
@@ -67,7 +67,7 @@ def load_train():
 
 
 @timeit
-def load_test():
+def load_test(**kwargs):
     print("Loading test data")
     mndata = MNIST_lzma('./MNIST/', return_type='numpy', lzma=True)
 
@@ -97,8 +97,8 @@ def normalize_img(image, label):
 
 
 @timeit
-def create_train():
-    train, tr_lbl = load_train()
+def create_train(**kwargs):
+    train, tr_lbl = load_train(**kwargs)
     ds_train = to_dataset(train, tr_lbl).map(normalize_img, num_parallel_calls=tf.data.AUTOTUNE)
     ds_train = ds_train.cache()
     # ds_train = ds_train.shuffle(len(tr_lbl)) #ds_info.splits['train'].num_examples)
@@ -109,8 +109,8 @@ def create_train():
 
 
 @timeit
-def create_test():
-    test, te_lbl = load_test()
+def create_test(**kwargs):
+    test, te_lbl = load_test(**kwargs)
     ds_test = to_dataset(test, te_lbl).map(normalize_img, num_parallel_calls=tf.data.AUTOTUNE)
     ds_test = ds_test.cache()
     ds_test = ds_test.batch(128)
@@ -119,7 +119,7 @@ def create_test():
 
 
 @timeit
-def train(train, test, level_name: str):
+def train(train, test, level_name: str, **kwargs):
     model = tf.keras.models.Sequential([
         tf.keras.layers.Input(shape=(28, 28, 1)),
         tf.keras.layers.Conv2D(level[level_name][0], (5, 5), activation='relu'),
@@ -170,11 +170,11 @@ def train(train, test, level_name: str):
     return history, model
 
 
-def do_it(level_name: str):
-    ds_train = create_train()
-    ds_test = create_test()
+def do_it(level_name: str, **kwargs):
+    ds_train = create_train(**kwargs)
+    ds_test = create_test(**kwargs)
 
-    return train(ds_train, ds_test, level_name)
+    return train(ds_train, ds_test, level_name, **kwargs)
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@
 import sys
 from pathlib import Path
 from threading import Thread
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 import cv2
 import wx
@@ -16,7 +16,7 @@ import ml_training
 import ml_evaluate
 
 modulus = 400
-
+log_time: Dict[str, int] = {}
 
 class RedirectText(object):
     def __init__(self, aWxTextCtrl: wx.TextCtrl):
@@ -40,7 +40,7 @@ class Train(Thread):
 
     def run(self) -> None:
         ml_training.epoch = self.epochs
-        ml_training.do_it(self.level_name)
+        ml_training.do_it(self.level_name, log_time=log_time, log_verbose=True)
         wx.CallAfter(self.this.train_done)
 
     @staticmethod
@@ -137,6 +137,8 @@ class MainForm(wx.Frame):
         print('************')
         print('**  DONE  **')
         print('************')
+        for k, v in log_time.items():
+            print(f"{k}: {v} ms")
         print()
         print("Training is over. You may now play with the model: click the button bellow.")
         print("Left click draws a shape (digit).")
