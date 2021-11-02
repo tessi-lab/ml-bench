@@ -18,6 +18,7 @@ import ml_evaluate
 modulus = 400
 log_time: Dict[str, int] = {}
 
+
 class RedirectText(object):
     def __init__(self, aWxTextCtrl: wx.TextCtrl):
         self.out = aWxTextCtrl
@@ -54,7 +55,7 @@ class Train(Thread):
 
 class MainForm(wx.Frame):
     def __init__(self):
-        wx.Frame.__init__(self, None, wx.ID_ANY, "Basic ML bench")
+        wx.Frame.__init__(self, None, wx.ID_ANY, "TessiLab's Basic ML bench")
 
         main_panel = wx.Panel(self, wx.ID_ANY)
         log = wx.TextCtrl(main_panel, wx.ID_ANY, size=(300, 100),
