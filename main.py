@@ -102,7 +102,7 @@ class MainForm(wx.Frame):
         net_panel.SetSizer(net_sizer)
         # out_net_sizer.Add(net_panel)
         out_net_panel.SetSizer(out_net_sizer)
-        self.radios[0].SetValue(True)
+        self.radios[2].SetValue(True)
 
         south_sizer = wx.BoxSizer(wx.HORIZONTAL)
         south_sizer.Add(out_net_panel) #, 0, wx.ALL, wx.LEFT, 5)
