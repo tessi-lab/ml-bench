@@ -11,12 +11,13 @@ There are some parameters that can be tuned.
 **Epoch**: number, positive integer. By default 20.
 
 **Neural network size**: controls the number of filters applied on 2 first layers
- - basic : [4, 8] enough to make the network converge,
- - normal: [8, 16] enough to make the network converge with more data,
- - heavy: [16, 32] too many filters for a such a simple task,
- - too-heavy: [64, 128] idem, but quadruple, will probably not converge,
- - stupid: [128, 256] idem, but stupidly huge,
- - insane: [256, 512] idem, but insanely huge.
+ - `light : `[2, 4],
+ - `basic : `[4, 8] enough to make the network converge,
+ - `normal: `[8, 16] enough to make the network converge with more data,
+ - `heavy : `[16, 32] too many filters for a such a simple task,
+ - `too-heavy:`[64, 128] idem, but quadruple, will probably not converge,
+ - `stupid: `[128, 256] idem, but stupidly huge,
+ - `insane: `[256, 512] idem, but insanely huge.
 
 The button **Launch training !** does just that, each step is timed.
 It will display something like  :

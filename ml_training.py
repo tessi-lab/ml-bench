@@ -11,6 +11,7 @@ from time_util import timeit
 reshape = True
 epoch = 20
 level: Dict[str, List[int]] = {
+    'light': [2, 4],
     'basic': [4, 8],
     'normal': [8, 16],
     'heavy': [16, 32],
