@@ -224,7 +224,7 @@ class DrawPanel(wx.Frame):
         width = size.width
         dc.DrawRectangle(0, 0, width, size.height)
         for points in self.points:
-            ep = int(width / 12)
+            ep = int(0.5 + width / 10)
             dc.SetPen(wx.Pen(wx.WHITE, ep))
             previous = None
             for point in points:
@@ -238,8 +238,10 @@ class DrawPanel(wx.Frame):
 
     def predict(self):
         image = self.paint_to_image()
-        # th, image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        image = cv2.resize(image, (28, 28), interpolation=cv2.INTER_LANCZOS4)
+        modulus_ = int(0.5 + modulus / 10)
+        modulus_ = modulus_ if modulus_ % 2 == 1 else modulus_ + 1
+        image = cv2.GaussianBlur(image, (modulus_, modulus_), 1.0)
+        image = cv2.resize(image, (28, 28), interpolation=cv2.INTER_CUBIC)
         cv2.imwrite("28.png", image)
         digit = ml_evaluate.predict(self.model, image)
         self.SetTitle(f"You drew a {digit} on Panel")
