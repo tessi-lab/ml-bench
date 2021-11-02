@@ -2,6 +2,7 @@ import lzma
 import random
 from typing import Dict, List
 
+import cv2.cv2
 from mnist import MNIST
 import tensorflow as tf
 import numpy as np
@@ -21,7 +22,7 @@ level: Dict[str, List[int]] = {
 }
 
 
-def print_sample(sample: np.ndarray):
+def print_sample(sample: np.ndarray, **kwargs):
     print(f"+{'-' * 28}+")
     for y in range(28):
         ss = ""
@@ -41,6 +42,8 @@ def print_sample(sample: np.ndarray):
             ss += s
         print(f"|{ss}|")
     print(f"+{'-' * 28}+")
+    if kwargs is not None and 'num' in kwargs and kwargs.get("save_it") is True:
+        cv2.imwrite(f"sample-{kwargs['num']}.png", np.reshape(sample, (28, 28)))
 
 
 class MNIST_lzma(MNIST):
@@ -63,7 +66,7 @@ def load_train(**kwargs):
     train, tr_lbl = mndata.load_training()
     rnd = int(len(tr_lbl) * random.random())
     print(f"This is a {tr_lbl[rnd]}")
-    print_sample(train[rnd])
+    print_sample(train[rnd], save_it=False, num=tr_lbl[rnd])
     return train, tr_lbl
 
 
@@ -75,7 +78,7 @@ def load_test(**kwargs):
     test, te_lbl = mndata.load_testing()
     rnd = int(len(te_lbl) * random.random())
     print(f"This is a {te_lbl[rnd]}")
-    print_sample(test[rnd])
+    print_sample(test[rnd], save_it=False, num=te_lbl[rnd])
     return test, te_lbl
 
 
