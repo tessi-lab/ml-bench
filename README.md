@@ -1,5 +1,15 @@
 # ML-Benchmark
 
+### Visuals
+Main Screen
+
+![Main screen](/assets/screen-capture1.jpg?raw=true "Main screen")
+
+
+Test Screen
+
+![Test screen](/assets/screen-capture2.jpg?raw=true "Test screen")
+
 ### Description
 
 This projet aims to compare performance
