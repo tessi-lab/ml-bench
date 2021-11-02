@@ -31,11 +31,11 @@ Right click removes the last line drawn.
 ### Installation
 Install python 3.8 for your system, create a virtual-env:
 
-`python -m venv ml-bench`
+`python3 -m venv venv-ml-bench`
 
 Use the right activate for your shell (for example bash)
 
-`source ml-bench/bin/activate`
+`source venv-ml-bench/bin/activate`
 
 Download sources from Github:
 
