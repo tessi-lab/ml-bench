@@ -52,3 +52,20 @@ Example:
 Launch the tool : 
 
 `python benchmark.py`
+
+### Results
+#### iMac 2015, core i5, AMD Radeon R9 M390 2 Go, 24 GB RAM, SSD 1TB
+##### Run on CPU only (requirements.txt)
+- 'load_train'  5802.60 ms
+- 'create_train'  12206.21 ms
+- 'load_test'  943.89 ms
+- 'create_test'  991.74 ms
+- 'train'  328884.54 ms
+
+##### Run on GPU + CPU (requirements_macos_intel.txt)
+- 'load_train'  5908.59 ms
+- 'create_train'  11447.35 ms
+- 'load_test'  944.63 ms
+- 'create_test'  992.16 ms
+- 'train'  263666.66 ms
+
