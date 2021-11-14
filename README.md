@@ -57,7 +57,17 @@ Download sources from Github:
 Install the packages for your system.
 For macOS with Apple Silicon see this [article](https://developer.apple.com/metal/tensorflow-plugin/).
 
-**EDIT**: It seems not so easy to install the requirements on Apple Silicon: help needed! (I do not have such computer)
+With a M1 Apple Silicon :
+`bash Miniforge3-MacOSX-arm64.sh`
+`. miniforge3/bin/activate`
+`conda install -c apple tensorflow-deps`
+`pip install tensorflow-macos`
+`pip install tensorflow-metal`
+`conda install -c apple wxpython`
+`conda install -c apple opencv`
+`pip install python-mnist`
+
+With an Intel Mac:
 
 Example: 
 
@@ -67,7 +77,7 @@ Launch the tool :
 
 `python benchmark.py`
 
-### Results
+### Results for size normal and 20 epochs
 #### iMac 2015, core i5, AMD Radeon R9 M390 2 Go, 24 GB RAM, SSD 1TB
 ##### Run on CPU only (requirements.txt)
 - 'load_train'  5802.60 ms
@@ -83,3 +93,9 @@ Launch the tool :
 - 'create_test'  992.16 ms
 - 'train'  263666.66 ms
 
+#### iMac 2020 24' M1 - 16GB RAM - SSD 1 TB
+- LOAD_TRAIN: 3359 ms
+- CREATE_TRAIN: 6436 ms
+- LOAD_TEST: 541 ms
+- CREATE_TEST: 558 ms
+- TRAIN: 138559 ms
