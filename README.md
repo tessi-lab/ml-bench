@@ -77,6 +77,10 @@ Launch the tool :
 
 `python benchmark.py`
 
+or
+
+`pythonw benchmark.py`
+
 ### Results for size normal and 20 epochs
 #### iMac 2015, core i5, AMD Radeon R9 M390 2 Go, 24 GB RAM, SSD 1TB
 ##### Run on CPU only (requirements.txt)
@@ -93,24 +97,47 @@ Launch the tool :
 - 'create_test'  992.16 ms
 - 'train'  263666.66 ms
 
-#### iMac 2020 24' M1 - 16GB RAM - SSD 1 TB
-- LOAD_TRAIN: 3359 ms
-- CREATE_TRAIN: 6436 ms
-- LOAD_TEST: 541 ms
-- CREATE_TEST: 558 ms
-- TRAIN: 138559 ms
+#### iMac 2020 24' M1 - 16GB RAM - SSD 1 TB Metal (8 GPU Cores)
+- LOAD_TRAIN: 3326 ms
+- CREATE_TRAIN: 6384 ms
+- LOAD_TEST: 523 ms
+- CREATE_TEST: 540 ms
+- TRAIN: 129372 ms
 
-#### MacBook 2019 16' - 32 GB RAM - SSD 1 TB on CPU
+#### iMac 2020 24' M1 - 16GB RAM - SSD 1 TB CPU Only
+(same computer uninstall tensorflow-metal package)
+
+- LOAD_TRAIN: 3242 ms
+- CREATE_TRAIN: 6304 ms
+- LOAD_TEST: 518 ms
+- CREATE_TEST: 535 ms
+- TRAIN: 217383 ms
+
+#### MacBook 2019 16' - i9 - 32 GB RAM - SSD 1 TB on CPU and battery (turbo boost switcher)
 - LOAD_TRAIN: 8470 ms
 - CREATE_TRAIN: 16285 ms
 - LOAD_TEST: 1308 ms
 - CREATE_TEST: 1373 ms
 - TRAIN: 1105780 ms 
 
-#### MacBook 2019 16' - 32 GB RAM - SSD 1 TB on GPU 5500M (8GB)
+#### MacBook 2019 16' - i9 - 32 GB RAM - SSD 1 TB on CPU and plugged to the wall
+- LOAD_TRAIN: 4760 ms
+- CREATE_TRAIN: 9552 ms
+- LOAD_TEST: 746 ms
+- CREATE_TEST: 782 ms
+- TRAIN: 437925 ms
+
+#### MacBook 2019 16' - i9 - 32 GB RAM - SSD 1 TB on GPU 5500M (8GB) and battery (turbo boost switcher)
 - LOAD_TRAIN: 8492 ms
 - CREATE_TRAIN: 17309 ms
 - LOAD_TEST: 1343 ms
 - CREATE_TEST: 1409 ms
 - TRAIN: 222868 ms
+
+#### MacBook 2019 16' - i9 - 32 GB RAM - SSD 1 TB on GPU 5500M (8GB) and plugged to the wall
+- LOAD_TRAIN: 4625 ms
+- CREATE_TRAIN: 10190 ms
+- LOAD_TEST: 722 ms
+- CREATE_TEST: 759 ms
+- TRAIN: 153928 ms
 
