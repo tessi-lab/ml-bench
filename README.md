@@ -56,6 +56,9 @@ Download sources from Github:
 
 Install the packages for your system.
 For macOS with Apple Silicon see this [article](https://developer.apple.com/metal/tensorflow-plugin/).
+
+**EDIT**: It seems not so easy to install the requirements on Apple Silicon: help needed! (I do not have such computer)
+
 Example: 
 
 `python -m pip install -r requirements.txt`
