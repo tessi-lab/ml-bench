@@ -2,7 +2,7 @@ import lzma
 import random
 from typing import Dict, List
 
-import cv2.cv2
+import cv2
 from mnist import MNIST
 import tensorflow as tf
 import numpy as np
