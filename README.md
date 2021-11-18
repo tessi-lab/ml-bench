@@ -57,21 +57,22 @@ Download sources from Github:
 Install the packages for your system.
 For macOS with Apple Silicon see this [article](https://developer.apple.com/metal/tensorflow-plugin/).
 
-With a M1 Apple Silicon :
-`bash Miniforge3-MacOSX-arm64.sh`
-`. miniforge3/bin/activate`
-`conda install -c apple tensorflow-deps`
-`pip install tensorflow-macos`
-`pip install tensorflow-metal`
-`conda install -c apple wxpython`
-`conda install -c apple opencv`
-`pip install python-mnist`
+_With a M1 Apple Silicon_ :
 
-With an Intel Mac:
+    bash Miniforge3-MacOSX-arm64.sh
+    . miniforge3/bin/activate
+    conda install -c apple tensorflow-deps
+    pip install tensorflow-macos
+    pip install tensorflow-metal
+    conda install -c apple wxpython
+    conda install -c apple opencv
+    pip install python-mnist
+
+_With an Intel Mac_:
 
 Example: 
 
-`python -m pip install -r requirements.txt`
+`python -m pip install -r requirements_macos_intel.txt`
 
 Launch the tool : 
 
