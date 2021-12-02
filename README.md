@@ -142,7 +142,7 @@ or
 - CREATE_TEST: 759 ms
 - TRAIN: 153928 ms
 
-#### MacBook 2021 16' - M1 Max - 64 GB RAM - SSD 2 TB and plugged to the wall
+#### MacBook 2021 16' - M1 Pro - 64 GB RAM - SSD 2 TB and plugged to the wall
 - LOAD_TRAIN: 3224 ms
 - CREATE_TRAIN: 6292 ms
 - LOAD_TEST: 517 ms
