@@ -1,5 +1,6 @@
 import lzma
 import random
+import time
 from typing import Dict, List
 
 import cv2
@@ -176,12 +177,57 @@ def train(train, test, level_name: str, **kwargs):
     return history, model
 
 
-def do_it(level_name: str, **kwargs):
-    ds_train = create_train(**kwargs)
-    ds_test = create_test(**kwargs)
+def create_dataset(x, y):
+    ds_train = to_dataset(x, y).map(normalize_img, num_parallel_calls=tf.data.AUTOTUNE)
+    ds_train = ds_train.cache()
+    ds_train = ds_train.prefetch(tf.data.AUTOTUNE)
+    return ds_train
 
-    return train(ds_train, ds_test, level_name, **kwargs)
+
+def do_it(level_name: str, **kwargs):
+    if kwargs.get("tune_bs") == True:
+        tr, tr_lbl = load_train(**kwargs)
+        te, te_lbl = load_test(**kwargs)
+        ds_train = create_dataset(tr, tr_lbl)
+        ds_test = create_dataset(te, te_lbl)
+
+        tune_batch_size(ds_test, ds_train, level_name)
+        return None, None
+    else:
+        ds_train = create_train(**kwargs)
+        ds_test = create_test(**kwargs)
+
+        return train(ds_train, ds_test, level_name, **kwargs)
+
+
+@timeit
+def tune_batch_size(ds_test, ds_train, level_name):
+    global batch_size, epoch
+    batch_size = 16
+    epoch = 2
+    duration = 1e300
+    selected_bs: int = batch_size
+    with open('sweet_spot.txt', 'w') as f:
+        for i in range(10):
+            batch_size = batch_size * 2
+            print(f"testing with batch_size = {batch_size}")
+            current_train_ds = ds_train.batch(batch_size)
+            current_test_ds = ds_test.batch(batch_size)
+            start = time.time_ns()
+            train(current_train_ds, current_test_ds, level_name)
+            end = time.time_ns()
+            d = end - start
+            if d < duration:
+                duration = d
+                selected_bs = batch_size
+            duration = min(d, duration)
+            f.write(f"{batch_size}, {d}\n")
+            f.flush()
+        f.write(f"#selected: {selected_bs}")
+    print(f"Selected batch size: {selected_bs}")
+    batch_size = selected_bs
 
 
 if __name__ == "__main__":
-    h, m = do_it('basic')
+    # h, m = do_it('basic')
+    h, m = do_it('basic', tune_bs=True)

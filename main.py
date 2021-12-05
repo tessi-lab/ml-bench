@@ -5,7 +5,7 @@
 import sys
 from pathlib import Path
 from threading import Thread
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Optional
 
 import cv2
 import wx
@@ -33,16 +33,17 @@ class RedirectText(object):
 
 
 class Train(Thread):
-    def __init__(self, this, level_name: str, epochs: int = 20):
+    def __init__(self, this, level_name: str, epochs: int = 20, batch_test: bool = False):
         super().__init__()
         self.this: MainForm = this
         self.epochs = epochs
         self.level_name = level_name
+        self.batch_test = batch_test
 
     def run(self) -> None:
         ml_training.epoch = self.epochs
-        ml_training.do_it(self.level_name, log_time=log_time, log_verbose=True)
-        wx.CallAfter(self.this.train_done)
+        ml_training.do_it(self.level_name, tune_bs=self.batch_test, log_time=log_time, log_verbose=True)
+        wx.CallAfter(self.this.train_done, self.batch_test)
 
     @staticmethod
     def get_epochs() -> int:
@@ -66,6 +67,10 @@ class MainForm(wx.Frame):
         log.SetFont(wx.Font(info))
 
         south_panel = wx.Panel(main_panel, wx.ID_ANY)
+        self.batch_detect = wx.Button(south_panel, wx.ID_ANY, 'Detect batch size')
+        self.batch_detect.SetToolTip("Detect the sweet spot for this CPU/GPU.\n"
+                                     "It may crash be records the last good one.")
+        self.Bind(wx.EVT_BUTTON, self.onBSButton, self.batch_detect)
         self.btn = wx.Button(south_panel, wx.ID_ANY, 'Launch training !')
         self.Bind(wx.EVT_BUTTON, self.onButton, self.btn)
         self.play_btn = wx.Button(south_panel, wx.ID_ANY, 'Play with it !')
@@ -78,7 +83,7 @@ class MainForm(wx.Frame):
         # Add widgets to a sizer
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(log, 1, wx.ALL | wx.EXPAND, 5)
-        sizer.Add(south_panel, 0, wx.ALL | wx.CENTER, 5)
+        sizer.Add(south_panel, 0, wx.ALL | wx.ALIGN_LEFT, 5)
 
         out_net_panel = wx.Panel(south_panel, wx.ID_ANY)
         out_net_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -104,11 +109,29 @@ class MainForm(wx.Frame):
         out_net_panel.SetSizer(out_net_sizer)
         self.radios[2].SetValue(True)
 
+        south_west = wx.Panel(south_panel, wx.ID_ANY)
+        south_west_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        south_west.SetSizer(south_west_sizer)
+
+        png = wx.Image('./assets/logo.png', wx.BITMAP_TYPE_ANY)
+        png = png.Rescale(png.GetWidth()/2, png.GetHeight()/2, wx.IMAGE_QUALITY_BICUBIC)
+        png = png.ConvertToBitmap()
+        w = png.GetWidth()
+        h = png.GetHeight()
+        logo = wx.StaticBitmap(south_west, wx.ID_ANY, png)
+        logo.Bind(wx.EVT_MOUSE_EVENTS, self._logo_clicked)
+        south_west.Bind(wx.EVT_MOUSE_EVENTS, self._logo_clicked)
+        south_west_sizer.Add(logo)
+        spacer = wx.StaticText(south_west, wx.ID_ANY, size=(w, h))
+        south_west_sizer.Add(spacer)
+
         south_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        south_sizer.Add(south_west, wx.ALIGN_LEFT)
         south_sizer.Add(out_net_panel) #, 0, wx.ALL, wx.LEFT, 5)
         south_sizer.Add(lbl)
         south_sizer.Add(self.epochs)
         south_sizer.Add(self.btn)
+        south_sizer.Add(self.batch_detect)
         south_sizer.Add(self.play_btn)
         south_panel.SetSizer(south_sizer)
 
@@ -122,7 +145,36 @@ class MainForm(wx.Frame):
 
         self.Maximize(True)
         print("Click a button below.")
+        self._reload_batch_size()
         wx.CallLater(1000, print, "Waiting...")
+
+    def _reload_batch_size(self):
+        sweet_spot = Path('sweet_spot.txt')
+        if sweet_spot.exists():
+            with open(sweet_spot, 'r') as f:
+                selected_bs = -1
+                min_duration = 1e300
+                for l in f.readlines():
+                    l: str
+                    if l.startswith('#'):
+                        continue
+                    else:
+                        s = l.split(', ')
+                        bs = int(s[0])
+                        duration = int(s[1])
+                        if duration < min_duration:
+                            selected_bs = bs
+                            min_duration = duration
+                if selected_bs > 0:
+                    ml_training.batch_size = selected_bs
+                    print(f"Selected batch size is {ml_training.batch_size} from previous 'sweet_spot.txt'")
+                    self._flash_button(self.btn)
+                else:
+                    print("You should start by choosing the right batch size with button 'Detect batch size'")
+                    self._flash_button(self.batch_detect)
+        else:
+            print("You should start by choosing the right batch size with button 'Detect batch size'")
+            self._flash_button(self.batch_detect)
 
     def check_model_and_enable_ui(self):
         auto_path = Path("./auto")
@@ -131,8 +183,7 @@ class MainForm(wx.Frame):
         else:
             wx.CallAfter(self.play_btn.Enable, False)
 
-    def train_done(self):
-        self.btn.Enable(True)
+    def train_done(self, batch_detect: bool = False):
         self.check_model_and_enable_ui()
         print()
         print('************')
@@ -141,14 +192,22 @@ class MainForm(wx.Frame):
         for k, v in log_time.items():
             print(f"{k}: {v} ms")
         print()
-        print("Training is over. You may now play with the model: click the button bellow.")
-        print("Left click draws a shape (digit).")
-        print("Right click deletes the last segment.")
-        print("The result is diplayed in the window title.")
+        self.batch_detect.Enable(True)
+        self.btn.Enable(True)
+        if batch_detect:
+            self._flash_button(self.btn)
+        else:
+            self.btn.Enable(True)
+            print("Training is over. You may now play with the model: click the button bellow.")
+            print("Left click draws a shape (digit).")
+            print("Right click deletes the last segment.")
+            print("The result is diplayed in the window title.")
+            self._flash_button(self.play_btn)
 
-    def onButton(self, event):
-        global frame
+    def onBSButton(self, event):
         self.btn.Enable(False)
+        self.batch_detect.Enable(False)
+        self.play_btn.Enable(False)
         try:
             ep = int(self.epochs.GetValue())
             name = 'basic'
@@ -156,11 +215,35 @@ class MainForm(wx.Frame):
                 if r.GetValue():
                     name = r.GetName()
                     break
-            print(f"Will train with neural network size {name}")
+            print(f"Will search batch size with neural network size {name}")
+            self.train = Train(self, name, ep, True)
+            self.train.start()
+        except:
+            self.btn.Enable(True)
+            self.batch_detect.Enable(True)
+            self.play_btn.Enable(True)
+            self.epochs.SetFocus()
+
+
+    def onButton(self, event):
+        global frame
+        self.btn.Enable(False)
+        self.batch_detect.Enable(False)
+        self.play_btn.Enable(False)
+        try:
+            ep = int(self.epochs.GetValue())
+            name = 'basic'
+            for r in self.radios:
+                if r.GetValue():
+                    name = r.GetName()
+                    break
+            print(f"Will train with neural network size {name} and batch size = {ml_training.batch_size}")
             self.train = Train(self, name, ep)
             self.train.start()
         except:
             self.btn.Enable(True)
+            self.batch_detect.Enable(True)
+            self.play_btn.Enable(True)
             self.epochs.SetFocus()
 
     def onButtonPlay(self, event):
@@ -169,6 +252,25 @@ class MainForm(wx.Frame):
         frame = DrawPanel()
         frame.Show()
         self.Show(False)
+
+    __normal_color: Optional[wx.Colour] = None
+
+    def _flash_button(self, button: wx.Button, times: int = 5, will_hi_light: bool = True):
+        if will_hi_light:
+            if self.__normal_color is None:
+                self.__normal_color = button.GetForegroundColour()
+            button.SetForegroundColour(wx.GREEN)
+        else:
+            button.SetForegroundColour(self.__normal_color)
+            times -= 1
+
+        if times > 0:
+            wx.CallLater(800, self._flash_button, button, times, not will_hi_light)
+
+    def _logo_clicked(self, event: wx.MoveEvent):
+        if event.GetEventType() == wxEVT_LEFT_UP:
+            from webbrowser import open
+            open('https://www.tessi.eu/en/innovation-by-tessi/#tessi-lab')
 
 
 class DrawPanel(wx.Frame):
