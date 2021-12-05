@@ -83,6 +83,13 @@ or
 `pythonw benchmark.py`
 
 ### Results for size normal and 20 epochs
+#### AlienWare Ryzen Edition AMD Ryzen 9 5950X 16-Core 64 GB RAM, SSD PM9A1 2 TB
+- LOAD_TRAIN: 3380 ms
+- CREATE_TRAIN: 6354 ms
+- LOAD_TEST: 547 ms
+- CREATE_TEST: 569 ms
+- TRAIN: 116817 ms
+
 #### iMac 2015, core i5, AMD Radeon R9 M390 2 Go, 24 GB RAM, SSD 1TB
 ##### Run on CPU only (requirements.txt)
 - 'load_train'  5802.60 ms
