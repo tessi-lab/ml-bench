@@ -11,6 +11,8 @@ from time_util import timeit
 
 reshape = True
 epoch = 20
+batch_size = 128
+
 level: Dict[str, List[int]] = {
     'light': [2, 4],
     'basic': [4, 8],
@@ -106,7 +108,7 @@ def create_train(**kwargs):
     ds_train = to_dataset(train, tr_lbl).map(normalize_img, num_parallel_calls=tf.data.AUTOTUNE)
     ds_train = ds_train.cache()
     # ds_train = ds_train.shuffle(len(tr_lbl)) #ds_info.splits['train'].num_examples)
-    ds_train = ds_train.batch(128)
+    ds_train = ds_train.batch(batch_size)
     ds_train = ds_train.prefetch(tf.data.AUTOTUNE)
     print(len(list(ds_train.as_numpy_iterator())))
     return ds_train
@@ -117,7 +119,7 @@ def create_test(**kwargs):
     test, te_lbl = load_test(**kwargs)
     ds_test = to_dataset(test, te_lbl).map(normalize_img, num_parallel_calls=tf.data.AUTOTUNE)
     ds_test = ds_test.cache()
-    ds_test = ds_test.batch(128)
+    ds_test = ds_test.batch(batch_size)
     ds_test = ds_test.prefetch(tf.data.AUTOTUNE)
     return ds_test
 
